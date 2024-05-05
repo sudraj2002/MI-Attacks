@@ -1,6 +1,19 @@
 import torch
 import torch.nn as nn
+import math
+class FixedPositionalEncoding(nn.Module):
+    def __init__(self, embed_size, max_len=5000):
+        super(FixedPositionalEncoding, self).__init__()
+        pe = torch.zeros(max_len, embed_size)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, embed_size, 2).float() * (-math.log(10000.0) / embed_size))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0).transpose(0, 1)
+        self.register_buffer('pe', pe)
 
+    def forward(self, x):
+        return x + self.pe[:x.size(0), :]
 class PatchEmbeddings(nn.Module):
     """Converts image into a sequence of flattened patches and projects them to a specified dimension."""
     def __init__(self, img_size, patch_size, in_channels, embed_size):
@@ -45,7 +58,8 @@ class VisionTransformer(nn.Module):
         super(VisionTransformer, self).__init__()
         self.patch_embeddings = PatchEmbeddings(img_size, patch_size, in_channels, embed_size)
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_size))
-        self.pos_embed = nn.Parameter(torch.randn(1, 1 + (img_size // patch_size) ** 2, embed_size))
+        # self.pos_embed = nn.Parameter(torch.randn(1, 1 + (img_size // patch_size) ** 2, embed_size))
+        self.pos_embed = FixedPositionalEncoding(embed_size)
         self.transformer_blocks = nn.Sequential(*[TransformerBlock(embed_size, num_heads, ff_dim, dropout) for _ in range(num_layers)])
         self.norm = nn.LayerNorm(embed_size)
         self.head = nn.Linear(embed_size, num_classes)
@@ -55,7 +69,7 @@ class VisionTransformer(nn.Module):
         b, n, _ = x.size()
         cls_tokens = self.cls_token.expand(b, -1, -1)  # Expand CLS token to full batch
         x = torch.cat((cls_tokens, x), dim=1)  # Concatenate CLS token with patch embeddings
-        x += self.pos_embed  # Add positional embeddings
+        x = self.pos_embed(x)  # Add positional embeddings
         x = self.transformer_blocks(x)
         x = self.norm(x[:, 0])  # Extract the representation of CLS token
         return self.head(x)

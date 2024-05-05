@@ -1,4 +1,4 @@
-import torch.nn as nn # importing torcnn nn module
+import torch.nn as nn
 class VGG16(nn.Module): # defining the VGG16 class
     def __init__(self, num_classes=10):
         super(VGG16, self).__init__()

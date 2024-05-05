@@ -1,5 +1,5 @@
 import torchvision.transforms as transforms
-from models.VGG import VGG16
+from VGG import VGG16
 from trainers import *
 from utils import *
 import torch.nn as nn

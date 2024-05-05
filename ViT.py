@@ -1,6 +1,6 @@
 import torch.nn as nn
 from transformers import ViTFeatureExtractor, ViTModel
-from MI_proj.models.ViT2 import VisionTransformer
+from ViT2 import VisionTransformer
 
 def ViT_pretrained(model_type="google/vit-base-patch16-224", num_classes=10):
     # Load pre-trained ViT model and feature extractor

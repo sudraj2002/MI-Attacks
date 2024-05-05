@@ -1,0 +1,1 @@
+python test.py --mode VGG --ckpt_path vgg_trained.ckpt --test_bsz 1 --attacks PGD

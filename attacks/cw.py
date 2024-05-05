@@ -2,44 +2,19 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from ..attack import Attack
 
-class CarliniWagnerL2(Attack):
-    """
-    Implementation of Carlini-Wagner L2 Attack. Original study:
-    'Towards Evaluating the Robustness of Neural Networks', available at
-    [https://arxiv.org/abs/1608.04644]
-
-    This attack is an optimization with L2 distance minimization.
-
-    Parameters:
-        model (nn.Module): Neural network model to compromise.
-        strength (float): Control parameter for trade-off between distance and confidence. (Default: 1)
-        confidence (float): Confidence margin for the adversary success. (Default: 0)
-        iterations (int): Number of optimization steps. (Default: 50)
-        learning_rate (float): Learning rate for the optimizer. (Default: 0.01)
-
-    The default parameter 'strength' may not always produce effective adversarial examples, consider adjusting it.
-
-    Data format:
-        - Input images: Tensor of shape (N, C, H, W)
-        - Target labels: Tensor of integers.
-        - Outputs: Adversarial images of the same shape as input images.
-
-    Usage Example:
-        >>> attack = CarliniWagnerL2(model, strength=1, confidence=0, iterations=50, learning_rate=0.01)
-        >>> adversarial_images = attack.apply(images, labels)
-    """
-
-    def __init__(self, model, strength=1, confidence=0, iterations=50, learning_rate=0.01):
-        super().__init__("CarliniWagnerL2", model)
+class CarliniWagnerL2:
+    def __init__(self, model, strength=1, confidence=0, iterations=50, learning_rate=0.01, device='cuda', targeted=True):
+        super(CarliniWagnerL2, self).__init__()
         self.strength = strength
         self.confidence = confidence
         self.iterations = iterations
         self.learning_rate = learning_rate
-        self.mode = ["default", "targeted"]
+        self.model = model
+        self.targeted = targeted
+        self.device = device
 
-    def apply(self, images, labels):
+    def forward(self, images, labels):
         """
         Generate adversarial examples from inputs.
         """
@@ -48,7 +23,7 @@ class CarliniWagnerL2(Attack):
         labels = labels.clone().detach().to(self.device)
 
         if self.targeted:
-            targets = self.get_target_label(images, labels)
+            targets = self.get_target_label(labels)
 
         w = self.inverse_hyperbolic_space(images).detach()
         w.requires_grad = True
@@ -109,3 +84,10 @@ class CarliniWagnerL2(Attack):
             return torch.clamp((other_logits - target_logits), min=-self.confidence)
         else:
             return torch.clamp((target_logits - other_logits), min=-self.confidence)
+
+    def model_logits(self, inputs):
+        logits = self.model(inputs)
+        return logits
+
+    def get_target_label(self, labels=None):
+        return labels
