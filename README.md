@@ -1,7 +1,11 @@
 # Adversarial Attacks on VGG and Vision Transformer
 
 This projects implements training and testing for VGG and Vision transformer (ViT) on the CIFAR10 dataset.
-
+## To Do
+1. Pretrained checkpoints
+2. Add report link
+3. Emails
+4. Remove unwanted files
 ## Requirements
   Run the following commands:
   ```
@@ -10,10 +14,6 @@ This projects implements training and testing for VGG and Vision transformer (Vi
   pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
   pip install seaborn matplotlib scikit-learn transformers
   ```
-## To Do
-1. Pretrained checkpoints
-2. Add report link
-3. Emails
 ## Usage
 ### Training
   To train the models run
