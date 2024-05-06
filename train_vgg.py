@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     # Define hyperparameters
     batch_size = 64
-    learning_rate = 0.001
+    learning_rate = 3e-4
     num_classes = 10
     num_epochs = 50
 

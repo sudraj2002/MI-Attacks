@@ -2,9 +2,21 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+# Define a wrapper for the ViT model to adjust its output
+class ViTModelWrapper(nn.Module):
+    def __init__(self, vit_model, head):
+        super(ViTModelWrapper, self).__init__()
+        self.vit_model = vit_model
+        self.head = head
+
+    def forward(self, x):
+        # Get the output from the ViT model
+        outputs = self.vit_model(x)
+        # Extract the last hidden state
+        return self.head(outputs.last_hidden_state.mean(1))
 
 class CarliniWagnerL2:
-    def __init__(self, model, strength=1, confidence=0, iterations=50, learning_rate=0.01, device='cuda', targeted=True):
+    def __init__(self, model, strength=10, confidence=5, iterations=50, learning_rate=0.01, device='cuda', targeted=True):
         super(CarliniWagnerL2, self).__init__()
         self.strength = strength
         self.confidence = confidence
@@ -14,16 +26,24 @@ class CarliniWagnerL2:
         self.targeted = targeted
         self.device = device
 
-    def forward(self, images, labels):
-        """
-        Generate adversarial examples from inputs.
-        """
+        if self.targeted:
+            print("Using targeted attack")
 
+        # If the network is a ViT
+        if type(model) is list:
+            if len(model) == 2:
+                self.model = ViTModelWrapper(model[0], model[1])
+
+
+    def forward(self, images, labels):
         images = images.clone().detach().to(self.device)
-        labels = labels.clone().detach().to(self.device)
+        targets = None
 
         if self.targeted:
-            targets = self.get_target_label(labels)
+            labels, targets = labels
+            targets = targets.clone().detach().to(self.device)
+
+        labels = labels.clone().detach().to(self.device)
 
         w = self.inverse_hyperbolic_space(images).detach()
         w.requires_grad = True

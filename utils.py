@@ -6,6 +6,8 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sn
 import pandas as pd
 import matplotlib.pyplot as plt
+from torch import nn
+
 from attacks import noise, pgd, fgsm, cw
 
 
@@ -33,6 +35,8 @@ def create_loaders(root, transform_train, transform_test, batch_size=64):
 
 # Function to plot confusion matrix
 def plot_confusion_matrix(all_labels, all_preds, save_dir='plots', save_path=None):
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
     cm = confusion_matrix(all_labels, all_preds)
     df_cm = pd.DataFrame(cm, index=[i for i in range(10)], columns=[i for i in range(10)])
     plt.figure(figsize=(10,7))
@@ -41,10 +45,11 @@ def plot_confusion_matrix(all_labels, all_preds, save_dir='plots', save_path=Non
     plt.ylabel('True')
 
     # Save the figure to a file
-    save_path = os.path.join(save_dir, save_path)
-
-    plt.show()
-    plt.savefig(save_path)
+    if save_path is not None:
+        save_path = os.path.join(save_dir, save_path)
+        plt.savefig(save_path)
+        plt.show(block=False)
+        plt.close()
 
 
 def create_attack(attack, model, device='cuda', targeted=False):
@@ -60,3 +65,5 @@ def create_attack(attack, model, device='cuda', targeted=False):
         return cw.CarliniWagnerL2(model, device=device, targeted=targeted)
     else:
         raise ValueError(f"Requested attack {attack} not implemented")
+
+

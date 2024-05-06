@@ -2,6 +2,20 @@ import torch
 import torch.nn as nn
 
 
+# Define a wrapper for the ViT model to adjust its output
+class ViTModelWrapper(nn.Module):
+    def __init__(self, vit_model, head):
+        super(ViTModelWrapper, self).__init__()
+        self.vit_model = vit_model
+        self.head = head
+
+    def forward(self, x):
+        # Get the output from the ViT model
+        outputs = self.vit_model(x)
+        # Extract the last hidden state
+        return self.head(outputs.last_hidden_state.mean(1))
+
+
 class PGDAttack:
     def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, random_init=True, device='cuda', targeted=True):
         super(PGDAttack, self).__init__()
@@ -13,13 +27,19 @@ class PGDAttack:
         self.targeted = targeted
         self.model = model
 
+        if self.targeted:
+            print("Using targeted attack")
+
+        # If the network is a ViT
+        if type(model) is list:
+            if len(model) == 2:
+                self.model = ViTModelWrapper(model[0], model[1])
+
     def forward(self, inputs, targets):
-        r"""
-        Custom forward pass.
-        """
 
         inputs = inputs.clone().detach().to(self.device)
         targets = targets.clone().detach().to(self.device)
+        target_classes = None
 
         if self.targeted:
             target_classes = self.get_target_label(targets)

@@ -2,22 +2,40 @@ import torch
 import torch.nn as nn
 
 
+# Define a wrapper for the ViT model to adjust its output
+class ViTModelWrapper(nn.Module):
+    def __init__(self, vit_model, head):
+        super(ViTModelWrapper, self).__init__()
+        self.vit_model = vit_model
+        self.head = head
+
+    def forward(self, x):
+        # Get the output from the ViT model
+        outputs = self.vit_model(x)
+        # Extract the last hidden state
+        return self.head(outputs.last_hidden_state.mean(1))
+
 class SimpleFGSM:
     def __init__(self, model, eps=0.03137, device='cuda', targeted=True):
         super(SimpleFGSM, self).__init__()
         self.eps = eps
-        self.modes = ["default", "targeted"]
         self.model = model
         self.device = device
         self.targeted = targeted
 
-    def forward(self, images, labels):
-        """
-        Apply the attack to generate adversarial examples.
-        """
+        # If the network is a ViT
+        if type(model) is list:
+            if len(model) == 2:
+                self.model = ViTModelWrapper(model[0], model[1])
 
+        if self.targeted:
+            print("Using targeted attack")
+
+    def forward(self, images, labels):
         images = images.clone().detach().to(self.device)
         labels = labels.clone().detach().to(self.device)
+
+        targeted_labels = None
 
         if self.targeted:
             targeted_labels = self.get_target_label(labels)
