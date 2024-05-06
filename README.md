@@ -10,6 +10,10 @@ This projects implements training and testing for VGG and Vision transformer (Vi
   pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
   pip install seaborn matplotlib scikit-learn transformers
   ```
+## To Do
+1. Pretrained checkpoints
+2. Add report link
+3. Emails
 ## Usage
 ### Training
   To train the models run
@@ -19,11 +23,18 @@ This projects implements training and testing for VGG and Vision transformer (Vi
   ```
   The checkpoints for the trained VGG and ViT will be saved as ```vgg_trained.ckpt``` and ```vit_trained.ckpt```, respectively.
 
+  For adversarial training, run
+  ```
+  python train_vgg_adversarial.py
+  ```
+  The network trained using adversarial training will be saved as ```vgg_trained_adversarial.ckpt```.
+
 ### Testing
   To test the models for all attack configurations listed in the [report](report), run 
   ```
   bash test_vgg_configs.sh
   bash test_vit_configs.sh
+  bash test_vgg_configs_adversarial.sh
   ```
   Custom testing can be done according to the ```args``` in ```test.py```.
 ## Authors
