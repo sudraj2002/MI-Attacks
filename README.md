@@ -4,7 +4,6 @@ This projects implements training and testing for VGG and Vision transformer (Vi
 ## To Do
 1. Pretrained checkpoints
 2. Add report link
-3. Emails
 4. Remove unwanted files
 ## Requirements
   Run the following commands:
@@ -38,4 +37,4 @@ This projects implements training and testing for VGG and Vision transformer (Vi
   ```
   Custom testing can be done according to the ```args``` in ```test.py```.
 ## Authors
-Sudarshan Rajagopalan, Dhananjaya Jayasundara and Kartik Narayan
+Sudarshan Rajagopalan (sambasa2@jh.edu), Dhananjaya Jayasundara and Kartik Narayan
