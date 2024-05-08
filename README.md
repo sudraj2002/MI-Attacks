@@ -31,7 +31,7 @@ This projects implements training and testing for VGG and Vision transformer (Vi
   The network trained using adversarial training will be saved as ```vgg_trained_adversarial.ckpt```.
 
 ### Pre-trained checkpoints
-  Pre-trained checkpoints for all the above training configurations can be found at this [link](#https://drive.google.com/drive/folders/17w8C4D3R146_wF46U9z6BsOhcqu9vnNW?usp=sharing).
+  Pre-trained checkpoints for all the above training configurations can be found at this [link](https://drive.google.com/drive/folders/17w8C4D3R146_wF46U9z6BsOhcqu9vnNW?usp=sharing).
 ### Testing
   To test the models for all attack configurations listed in the [report](report), run 
   ```
