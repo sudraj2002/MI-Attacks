@@ -3,10 +3,6 @@
 This projects implements training and testing for VGG and Vision transformer (ViT) on the CIFAR10 dataset.
 
 [[Report](#report)]
-## To Do
-1. Pretrained checkpoints
-2. Add report link
-4. Remove unwanted files
 ## Requirements
   Run the following commands:
   ```
